@@ -1,5 +1,9 @@
 # homebridge-onkyo
+[![npm](https://img.shields.io/npm/dt/homebridge-onkyo.svg)](https://www.npmjs.com/package/homebridge-onkyo)
+[![npm](https://img.shields.io/npm/l/homebridge-onkyo.svg)](https://www.npmjs.com/package/homebridge-onkyo)
+
 [![NPM Version](https://img.shields.io/npm/v/homebridge-onkyo.svg)](https://www.npmjs.com/package/homebridge-onkyo)
+![Node.js CI](https://github.com/ToddGreenfield/homebridge-onkyo/workflows/Node.js%20CI/badge.svg?branch=master)
 
 Homebridge plugin for Onkyo Receivers
 Should work for all supported models as listed in the node_modules/eiscp/eiscp-commands.json. If your model is not listed, try TX-NR609.
@@ -11,7 +15,9 @@ Existing users of my original fork or gw-wiscon's be sure to update the "platfor
 
 # Changelog
 
-* Verison 0.7 iOS 12.2+ is now required. This is now a Platform, theoretically supporting multiple receivers. Each receiver is a TV accessory (which is why iOS 12.2+ is required). Input labels can customized with `inputs` in the config. An optional Dimmer service for separate volume control is available, useful for non-iPhone control and more advanced automations (it appears as a dimmable light bulb). To disable the volume dimmer, add `"volume_dimmer": false` to your receiver in config.
+* Version 0.8.0 supports more models with a newer version of eiscp.js. Also includes bug and performance fixes.
+* Version 0.7.5 introduces linter check for JSON files and code quality check using xo. Developers can now use "npm test" before submitting a pull request.
+* Version 0.7 iOS 12.2+ is now required. This is now a Platform, theoretically supporting multiple receivers. Each receiver is a TV accessory (which is why iOS 12.2+ is required). Input labels can customized with `inputs` in the config. An optional Dimmer service for separate volume control is available, useful for non-iPhone control and more advanced automations (it appears as a dimmable light bulb). To disable the volume dimmer, add `"volume_dimmer": false` to your receiver in config.
 * Version 0.6 includes support for zone2. Adds a new config parameter called "zone" and use "zone2". Thanks for the contrib mbbeaubi.
 * Version 0.5.x includes support for input-selector. Available inputs are dynamically pulled from the eiscp-commands.json file. Note: Not all inputs may work with your receiver.
 * Version 0.4.x includes support for volume, mute, and has options for setting default_input.
@@ -22,14 +28,16 @@ For Alexa Control of Volume, Mute, Input - (if using the Alexa plugin) - create 
 
 # To Do
 
-Complete re-write to convert to a Platform. This will allow for auto discovery of all receivers (if more than one exist), and other flexibility.
+Auto discovery of all receivers on the network (if more than one exist) and other flexibility.
 Adding Speaker A/B on/off control
 Others...
 
 # Installation
 
-Ensure that the Onkyo receiver is controllable using the OnkyoRemote3 iOS app.
-For Troubleshooting look in the homebridge-onkyo/node_modules/eiscp/examples directory and see if you can run 3.js. "node 3.js". It should output all available commands.
+As a prerequisite ensure that the Onkyo receiver is controllable using the OnkyoRemote3 iOS app.
+You also need to have [git](https://github.com/git/git) installed.
+
+It is recommended to install and configure this plugin using [homebridge-config-ui-x](https://github.com/oznu/homebridge-config-ui-x#readme), however you can also install manually using the following manual tasks:
 
 1. Install homebridge using: npm install -g homebridge
 2. Install this plugin using: npm install -g homebridge-onkyo
@@ -47,14 +55,19 @@ Example accessory config (needs to be added to the homebridge config.json):
                 "ip_address": "10.0.0.46",
                 "poll_status_interval": "3000",
                 "name": "Receiver",
-                "inputs": {
-                    "dvd": "Blu-ray",
-                    "video2": "Switch",
-                    "video3": "Wii U",
-                    "video6": "Apple TV",
-                    "video4": "AUX",
-                    "cd": "TV/CD"
-                },
+                "zone": "main",
+                "default_input": "net",
+                "default_volume": "10",
+                "max_volume": "40",
+                "map_volume_100": false,
+                "inputs": [
+                    {"input_name": "dvd", "display_name": "Blu-ray"},
+                    {"input_name": "video2", "display_name": "Switch"},
+                    {"input_name": "video3", "display_name": "Wii U"},
+                    {"input_name": "video6", "display_name": "Apple TV"},
+                    {"input_name": "video4", "display_name": "AUX"},
+                    {"input_name": "cd", "display_name": "TV/CD"}
+                ],
                 "volume_dimmer": false,
                 "switch_service": false,
                 "filter_inputs": true
@@ -72,13 +85,20 @@ Receiver Attributes         |
 ----------------------------|------------
 **name**					| (required) The name you want to use for control of the Onkyo accessories.
 **ip_address**  			| (required) The internal ip address of your Onkyo.
-**model**					| (required) Must be a valid model listed in node_modules/eiscp/eiscp-commands.json file. If your model is not listed, you can use the TX-NR609 if your model supports the Integra Serial Communication Protocol (ISCP).
+**model**					| (required) Must be a valid model listed in config.schema.json file. If your model is not listed, you can use the TX-NR609 if your model supports the Integra Serial Communication Protocol (ISCP).
 **poll_status_interval**  	| (optional) Poll Status Interval. Defaults to 0 or no polling.
 **default_input**  			| (optional) A valid source input. Default will use last known input. See output of 3.js in eiscp/examples for options.
 **default_volume**  		| (optional) Initial receiver volume upon powerup. This is the true volume number, not a percentage. Ignored if powerup from device knob or external app (like OnkyoRemote3).
 **max_volume**  			| (optional) Receiver volume max setting. This is a true volume number, not a percentage, and intended so there is not accidental setting of volume to 80. Ignored by external apps (like OnkyoRemote3). Defaults to 30.
 **map_volume_100**  		| (optional) Will remap the volume percentages that appear in the Home app so that the configured max_volume will appear as 100% in the Home app. For example, if the max_volume is 30, then setting the volume slider to 50% would set the receiver's actual volume to 15. Adjusting the stereo volume knob to 35 will appear as 100% in the Home app. This option could confuse some users to it defaults to off false, but it does give the user finer volume control especially when sliding volume up and down in the Home app. Defaults to False.
 **zone**              		| (optional) Defaults to main. Optionally control zone2 where supported.
-**inputs**					| (optional) List of inputs you want populated for the TV service and what you want them to be labeled. Inputs not listed are omitted.
+**inputs**					| (optional) List of inputs you want populated for the TV service and what you want them to be displayed as.
 **filter_inputs**                   | (optional) Boolean value. Setting this to `true` limits inputs displayed in HomeKit to those you provide in `inputs`. If `false` or not defined, all inputs supported by `model` will be displayed.
 **volume_dimmer**					| (optional) Boolean value. Setting this to `false` disables additional Dimmer accessory for separate volume control.
+
+
+# Troubleshooting
+
+For Troubleshooting look in the homebridge-onkyo/node_modules/eiscp/examples directory and see if you can run 3.js. "node 3.js". It should output all available commands.
+
+You can find the output also in the [wiki](https://github.com/ToddGreenfield/homebridge-onkyo/wiki/EISCP-output-of-3.js).

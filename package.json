@@ -1,20 +1,24 @@
 {
   "name": "homebridge-onkyo",
-  "version": "0.7.2",
+  "version": "0.8.0",
   "description": "Homebridge plugin for Onkyo Receivers",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "pretest": "eslint --ignore-path .gitignore package.json config.schema.json",
+    "test": "xo"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ToddGreenfield/homebridge-onkyo.git"
   },
   "dependencies": {
-    "eiscp": "git://github.com/tillbaks/node-eiscp.git",
-    "math-round": "^1.0.0",
-    "polling-to-event": "^2.0.2",
-    "request": "^2.69.0"
+    "eiscp": "git://github.com/untitledlt/eiscp.js.git",
+    "polling-to-event": "^2.1.0"
+  },
+  "devDependencies": {
+    "eslint": "^6.3.0",
+    "eslint-plugin-json": "^2.1.1",
+    "xo": "^0.24.0"
   },
   "keywords": [
     "homebridge-plugin",
@@ -31,5 +35,40 @@
   "bugs": {
     "url": "https://github.com/ToddGreenfield/homebridge-onkyo/issues"
   },
-  "homepage": "https://github.com/ToddGreenfield/homebridge-onkyo#readme"
+  "homepage": "https://github.com/ToddGreenfield/homebridge-onkyo#readme",
+  "xo": {
+    "space": false,
+    "rules": {
+      "camelcase": "off",
+      "kebabCase": "off",
+      "no-mixed-spaces-and-tabs": "warn",
+      "no-useless-escape": "warn",
+      "indent": "off",
+      "quotes": "warn",
+      "capitalized-comments": "off",
+      "no-var": "warn",
+      "prefer-destructuring": "off",
+      "prefer-arrow-callback": "warn",
+      "object-shorthand": [
+        "off",
+        "always",
+        {
+          "ignoreConstructors": true
+        }
+      ],
+      "quote-props": "error",
+      "no-unused-vars": "warn",
+      "curly": [
+        "error",
+        "multi-or-nest",
+        "consistent"
+      ],
+      "no-use-before-define": [
+        "error",
+        {
+          "classes": false
+        }
+      ]
+    }
+  }
 }
