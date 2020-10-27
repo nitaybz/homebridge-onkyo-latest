@@ -7,7 +7,7 @@ function createAccessory(
   // The returned "services" for this accessory are simply an array of new-API-style
   // Service instances which we can add to a created HAP-NodeJS Accessory directly.
 
-  const accessoryUUID = uuid.generate(accessoryInstance.name);
+  const accessoryUUID = uuid.generate(accessoryInstance.name + 'receiver');
 
   const accessory = new platformAccessory(accessoryInstance.name, accessoryUUID, Accessory.Categories.AUDIO_RECEIVER);
 
@@ -17,11 +17,37 @@ function createAccessory(
       accessoryInstance.identify(callback);
     });
 
-  services.forEach(accessory.addService);
+  services.forEach(service => {
+    if (service instanceof Service.AccessoryInformation) {
+      const existingService = accessory.getService(
+        Service.AccessoryInformation
+      );
+
+      // pull out any values you may have defined
+      const manufacturer = service.getCharacteristic(
+        Characteristic.Manufacturer
+      ).value;
+      const model = service.getCharacteristic(Characteristic.Model).value;
+      const serialNumber = service.getCharacteristic(
+        Characteristic.SerialNumber
+      ).value;
+
+      if (manufacturer)
+        existingService.setCharacteristic(
+          Characteristic.Manufacturer,
+          manufacturer
+        );
+      if (model) existingService.setCharacteristic(Characteristic.Model, model);
+      if (serialNumber)
+        existingService.setCharacteristic(
+          Characteristic.SerialNumber,
+          serialNumber
+        );
+    } else 
+      accessory.addService(service)
+  });
 
   return accessory;
 }
 
-module.exports = {
-  createAccessory
-};
+module.exports = createAccessory;

@@ -5,7 +5,6 @@ let Characteristic;
 let RxInputs;
 const pollingtoevent = require('polling-to-event');
 const info = require('./package.json');
-const info = require('./package.json');
 const createAccessory = require('./createAccessory');
 
 class OnkyoPlatform {
@@ -37,7 +36,7 @@ class OnkyoPlatform {
 	}
 
 	configureAccessory(accessory) {
-		// debug("configuredAccessory", accessory);
+		// this.log.debug("configuredAccessory", accessory);
 	};
 }
 
