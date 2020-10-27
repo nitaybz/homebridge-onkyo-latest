@@ -145,7 +145,7 @@ class OnkyoAccessory {
 		this.eiscp.on(this.cmdMap[this.zone].input, this.eventInput.bind(this));
 
 		this.eiscp.connect(
-			{host: this.ip_address, reconnect: true}
+			{host: this.ip_address, reconnect: true, model: this.model}
 		);
 
 		this.setUp();
