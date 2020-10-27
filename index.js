@@ -5,6 +5,8 @@ let Characteristic;
 let RxInputs;
 const pollingtoevent = require('polling-to-event');
 const info = require('./package.json');
+const info = require('./package.json');
+const createAccessory = require('./createAccessory');
 
 class OnkyoPlatform {
 	constructor(log, config, api) {
@@ -29,12 +31,14 @@ class OnkyoPlatform {
 		receivers.forEach(receiver => {
 			const accessory = new OnkyoAccessory(platform, receiver);
 			platform.receiverAccessories.push(accessory);
-			});
+		});
+
+		platform.api.publishExternalAccessories('homebridge-onkyo-latest', platform.receiverAccessories.map(accessory => createAccessory(accessory, platform.api)));
 	}
 
-	accessories(callback) {
-		callback(this.receiverAccessories);
-	}
+	configureAccessory(accessory) {
+		// debug("configuredAccessory", accessory);
+	};
 }
 
 class OnkyoAccessory {
